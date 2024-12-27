@@ -7,7 +7,7 @@
 
 ```bash
 git clone https://github.com/Gyanesh-Rao28/capstone_backend.git
-cd backend-todo-app
+cd capstone_backend
 ```
 
 2. **Generate the Prisma Client**:

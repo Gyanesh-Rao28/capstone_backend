@@ -4,11 +4,13 @@ import prisma from "../db"
 
 export const login = async(req: Request, res: Response) => {
 
-    const {gmail} = await req.body
+    const { googleId, email, name} = await req.body
     
     const user = await prisma.user.create({
         data:{
-            gmail
+            googleId,
+            email, 
+            name
         }
     })
 
