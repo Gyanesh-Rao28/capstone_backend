@@ -1,3 +1,4 @@
 node_modules
-
+jsonkey.json
 .env
+docker-compose.yaml
