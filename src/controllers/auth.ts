@@ -1,19 +1,22 @@
-import { Request, Response } from "express"
-import prisma from "../db"
+import { Request, Response } from "express";
+import prisma from "../db";
+import { UserType } from "../types";
 
+export const login = async (req: Request, res: Response) => {
+    try {
+        // const user = req.user as UserType;
+        
+        const user:UserType | null = await prisma.user.findFirst({
+            where:{
+                id: req.user?.id
+            }
+        })
 
-export const login = async(req: Request, res: Response) => {
-
-    const { googleId, email, name} = await req.body
-    
-    const user = await prisma.user.create({
-        data:{
-            googleId,
-            email, 
-            name
-        }
-    })
-
-    res.json(user)
-
+        res.json(user);
+    } catch (error) {
+        res.status(400).json({
+            error: 'Failed to create user',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }   
 }

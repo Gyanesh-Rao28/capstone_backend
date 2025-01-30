@@ -10,6 +10,9 @@ services:
       - SESSION_SECRET=${SESSION_SECRET}
       - NODE_ENV=${NODE_ENV}
       - PORT=${PORT}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - BACKEND_URL=${BACKEND_URL}
     ports:
       - "5000:5000"
     depends_on:
