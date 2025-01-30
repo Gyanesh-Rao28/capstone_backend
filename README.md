@@ -25,7 +25,7 @@ cd capstone_backend
 *Also* - to run/apply migrations if necessary:
 
 `docker-compose run app npx prisma migrate deploy`
-
+docker compose run app npx prisma migrate dev --name init
 5. **Boot up 2x docker containers**:
 
 `docker compose up`

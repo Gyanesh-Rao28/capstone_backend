@@ -4,6 +4,6 @@ import { login } from "../controllers/auth";
 
 const authRouter:Router = Router()
 
-authRouter.post('/login', login)
+authRouter.get('/user/me', login)
 
 export default authRouter
