@@ -32,6 +32,8 @@ passport.use(
             passReqToCallback: true
         },
         async (_req, accessToken, refreshToken, profile, done) => {
+
+
             try {
                 let user = await prisma.user.findFirst({
                     where: { googleId: profile.id }
@@ -43,8 +45,8 @@ passport.use(
                             googleId: profile.id,
                             email: profile.emails?.[0].value || '',
                             name: profile.displayName,
-                            role: UserRole.student,
-                            department: null
+                            role: UserRole.user,
+                            profilePicture: profile._json.picture || null
                         },
                     });
                 }
