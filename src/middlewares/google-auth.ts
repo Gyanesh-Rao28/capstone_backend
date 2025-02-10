@@ -1,9 +1,14 @@
 //  middlewares/google-auth.ts
 
-
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import prisma from '../db';
+import { UserType } from '../types';
+
+interface RequestWithUser extends Request{
+    user?: UserType
+}
+
 
 const client = new OAuth2Client({
     clientId: process.env.GOOGLE_CLIENT_ID,
@@ -11,18 +16,16 @@ const client = new OAuth2Client({
 });
 
 export const isAuthenticated = async (
-    req: Request,
+    req: RequestWithUser,
     res: Response,
     next: NextFunction
-): Promise<void> => {
+) => {
     try {
-        // First check session authentication
         if (req.isAuthenticated()) {
             next();
             return;
         }
 
-        // Check for token in headers
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -38,8 +41,6 @@ export const isAuthenticated = async (
         try {   
 
             const tokenInfo = await client.getTokenInfo(token);
-
-            // Find user in database
             const user = await prisma.user.findFirst({
                 where: { email: tokenInfo.email }
             });
@@ -52,8 +53,9 @@ export const isAuthenticated = async (
                 return;
             }
 
-            // Attach user to request
+            
             req.user = user;
+            console.log("authorizing user : ",req.user.role)
             next();
             return;
 
