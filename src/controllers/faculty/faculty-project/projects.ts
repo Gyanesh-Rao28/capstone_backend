@@ -88,6 +88,20 @@ export const updateProject = async (req: Request, res: Response) => {
             });
         }
 
+        const isProjectExist = await prisma.project.findFirst({
+            where:{
+                id: projectId
+            }
+        })
+
+        if(!isProjectExist){
+            res.status(404).json({
+                status: 'error',
+                message: 'Project Not Found'
+            });
+            return
+        }
+
 
         const updateProject: ProjectType|null = await prisma.project.update({
             where:{
@@ -127,7 +141,7 @@ export const delProject = async(req: Request, res: Response)=>{
         const { projectId } = req.params
 
         const facultyId = req.user?.faculty?.id!!;
-        if (facultyId) {
+        if (!facultyId) {
             return res.status(404).json({
                 status: 'error',
                 message: 'Faculty Id not fonud'

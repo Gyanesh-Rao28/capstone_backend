@@ -2,15 +2,9 @@
   "name": "typescript_setup",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
-  "engines": {
-    "node": "22.x"
-  },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "npx nodemon",
-    "postinstall": "prisma generate"
+    "start": "ts-node src/index.ts",
+    "dev": "npx nodemon"
   },
   "keywords": [],
   "author": "",
