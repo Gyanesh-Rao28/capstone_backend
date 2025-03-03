@@ -1,0 +1,209 @@
+  generator client {
+    provider = "prisma-client-js"
+  }
+
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
+
+  // // Custom enums
+  // enum UserRole {
+  //   admin
+  //   faculty
+  //   student
+  // }
+
+  // // Models
+  // model User {
+  //   id        String   @id @default(uuid())
+  //   googleId  String   @unique
+  //   email     String   @unique
+  //   name      String
+  //   role UserRole
+  //   department String ?
+  //   profilePicture String ?
+  //   createdAt DateTime @default(now())
+  //   updatedAt DateTime @updatedAt
+  // }
+
+  // model Project{
+  //   id String @id @default(uuid())
+  //   name String
+  //   descrition String
+  //   createdAt DateTime @default(now())
+  //   updatedAt DateTime @updatedAt
+  //   user String
+  // }
+
+  // ENUMS
+  enum UserRole {
+    admin
+    faculty
+    student
+    user
+  }
+
+  enum CourseType {
+    IDP
+    UROP
+    Capstone
+  }
+
+  enum ProjectStatus {
+    draft
+    active
+    completed
+    archived
+  }
+  
+  enum ProjectDomain {
+    AIML
+    Cloud
+    Cyber
+    IOT
+  }
+
+  enum MemberRole {
+    Leader
+    Member
+  }
+
+  enum ApplicationStatus {
+    Pending
+    Approved
+    Rejected
+  }
+
+  // SHARED USER MODEL
+  model User {
+    id             String   @id @default(uuid())
+    googleId       String   @unique
+    email          String   @unique
+    name           String
+    role           UserRole @default(student)
+    profilePicture String?
+
+    // Role-Specific Relations
+    faculty Faculty?
+    student Student?
+    admin   Admin?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  }
+
+  // ADMIN MODEL (Only for Admin Users)
+  model Admin {
+    id String @id @default(uuid())
+
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  }
+
+  // FACULTY MODEL (Only for Faculty Users)
+  model Faculty {
+    id String @id @default(uuid())
+
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    department  String
+    designation String?
+
+    projects Project[]
+  }
+
+  // STUDENT MODEL (Only for Student Users)
+  model Student {
+    id        String  @id @default(uuid())
+
+    userId    String  @unique
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    studentId String  @unique //AP2110010239
+
+    batch     String?
+
+    members Member[]
+
+  }
+
+  // PROJECT MODEL (Faculty-Created Projects)
+  model Project {
+    id String @id @default(uuid())
+
+    facultyId String
+    faculty   Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+
+    title       String
+    description String @db.Text
+    domain      ProjectDomain @default(AIML)
+    status      ProjectStatus @default(draft)
+    course      CourseType    @default(IDP)
+    tags String[]
+    deadline    DateTime?
+
+
+    Group     Group[]
+    projectApplication ProjectApplication[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([facultyId])
+  }
+
+  model Group {
+    id String @id @default(uuid())
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    name       String
+    inviteCode String @unique @default(uuid())
+    maxMember Int @default(4)
+    isOpen Boolean @default(true)
+
+    members Member[]
+    projectApplication ProjectApplication[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([projectId])
+  }
+
+  model Member {
+    id String  @id @default(uuid())
+
+    groupId String
+    group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    studentId String
+    student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+    memberRole MemberRole @default(Member)
+
+    joinedAt DateTime @default(now())
+
+    @@index([groupId])
+    @@index([studentId])
+    @@unique([groupId, studentId])
+  }
+
+  model ProjectApplication {
+    id String @id @default(uuid())
+
+    groupId String
+    group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    applicationStatus ApplicationStatus @default(Pending)
+
+    @@index([groupId])
+    @@index([projectId])
+    @@unique([groupId, projectId])
+  }
