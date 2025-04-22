@@ -2,6 +2,7 @@ import { Router, RequestHandler } from "express";
 
 import { getStudent } from "../controllers/student/student";
 import { createGroup, addGroupMember, leaveGroup, removeMember } from "../controllers/student/group";
+import { applyToProject } from "../controllers/student/projectApplication";
 
 
 const studentRouter: Router = Router();
@@ -17,5 +18,6 @@ studentRouter.delete('/leaveGroup', leaveGroup as RequestHandler);
 studentRouter.delete('/removeMember', removeMember as RequestHandler);
 
 // create project application
+studentRouter.post('/createApplication', applyToProject as RequestHandler);
 
 export default studentRouter;
