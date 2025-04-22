@@ -1,7 +1,12 @@
-import {Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
+import multer from 'multer';
+import csvParser from 'csv-parser';
+import fs from 'fs';
 import prisma from '../../db';
 import { UserAdmin } from '../../types';
 
+
+const upload = multer({ dest: 'uploads/' });
 
 export const getAdminData = async (req:Request , res:Response)=>{
     try {
@@ -69,3 +74,101 @@ export const getAdminAnalytics = async (req: Request, res: Response) => {
         });
     }
 };
+
+// Upload Faculty CSV
+export const uploadFacultyCSV = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const file = req.file;
+        if (!file) {
+            res.status(400).json({ error: 'No file uploaded' });
+            return;
+        }
+
+        const facultyData: any[] = [];
+        fs.createReadStream(file.path)
+            .pipe(csvParser())
+            .on('data', (row) => {
+                facultyData.push(row);
+            })
+            .on('end', async () => {
+                try {
+                    // Insert data into the database
+                    for (const faculty of facultyData) {
+                        await prisma.faculty.create({
+                            data: {
+                                user: {
+                                    create: {
+                                        name: faculty.name,
+                                        email: faculty.email,
+                                        role: 'faculty',
+                                        googleId: faculty.googleId || null, // Provide googleId or set it to null
+                                    },
+                                },
+                                department: faculty.department,
+                                designation: faculty.designation,
+                            },
+                        });
+                    }
+
+                    // Delete the file after processing
+                    fs.unlinkSync(file.path);
+
+                    res.json({ message: 'Faculty data uploaded successfully' });
+                } catch (error) {
+                    next(error);
+                }
+            });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Upload Student CSV
+export const uploadStudentCSV = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const file = req.file;
+        if (!file) {
+            res.status(400).json({ error: 'No file uploaded' });
+            return;
+        }
+
+        const studentData: any[] = [];
+        fs.createReadStream(file.path)
+            .pipe(csvParser())
+            .on('data', (row) => {
+                studentData.push(row);
+            })
+            .on('end', async () => {
+                try {
+                    // Insert data into the database
+                    for (const student of studentData) {
+                        await prisma.student.create({
+                            data: {
+                                user: {
+                                    create: {
+                                        name: student.name,
+                                        email: student.email,
+                                        role: 'student',
+                                        googleId: student.googleId || null, // Provide googleId or set it to null
+                                    },
+                                },
+                                studentId: student.studentId,
+                                batch: student.batch,
+                            },
+                        });
+                    }
+
+                    // Delete the file after processing
+                    fs.unlinkSync(file.path);
+
+                    res.json({ message: 'Student data uploaded successfully' });
+                } catch (error) {
+                    next(error);
+                }
+            });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const uploadMiddleware = upload.single('file');
