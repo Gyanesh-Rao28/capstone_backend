@@ -55,6 +55,7 @@ export const postProject = async (req: Request, res: Response) => {
         });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             status: 'error',
             message: 'Internal server error : postProject'
@@ -99,7 +100,6 @@ export const updateProject = async (req: Request, res: Response) => {
                 status: 'error',
                 message: 'Project Not Found'
             });
-            return
         }
 
 

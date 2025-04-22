@@ -1,19 +1,22 @@
 import { UserRole } from '@prisma/client';
 import { Request, Response } from 'express';
+import prisma from '../../db';
+import { UserStudent } from '../../types';
 
 export const getStudent = async (req: Request, res: Response) => {
 
     try {
 
-        const student = req.user?.student
+        const student: UserStudent | null  = await prisma.user.findFirst({
+            where:{
+                id: req.user?.id
+            },
+            include:{
+                student: true
+            }
+        })
 
-        console.log(req.user)
-
-
-        return res.status(200).json({
-            status: 'success',
-            data: student
-        });
+        res.json(student)
         
 
     } catch (error) {

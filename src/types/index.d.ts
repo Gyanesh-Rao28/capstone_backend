@@ -48,7 +48,7 @@ export interface ProjectType {
 export interface Faculty {
     id: string;
     userId: string;
-    department: string;
+    department: string | null;
     designation: string | null;
     projects?: ProjectType[];
 }

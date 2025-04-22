@@ -108,7 +108,7 @@
     userId String @unique
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    department  String
+    department  String?
     designation String?
 
     projects Project[]
@@ -139,8 +139,8 @@
     title       String
     description String @db.Text
     domain      ProjectDomain @default(AIML)
-    status      ProjectStatus @default(draft)
     course      CourseType    @default(IDP)
+    status      ProjectStatus @default(draft)
     tags String[]
     deadline    DateTime?
 
@@ -160,9 +160,13 @@
     projectId String
     project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    name       String
     inviteCode String @unique @default(uuid())
-    maxMember Int @default(4)
+
+    name       String
+
+    maxMembers Int @default(4)
+    currentMember Int @default(1)
+
     isOpen Boolean @default(true)
 
     members Member[]
@@ -202,6 +206,8 @@
     project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
     applicationStatus ApplicationStatus @default(Pending)
+
+    // add project application created time in order filter the application in asc/desc order
 
     @@index([groupId])
     @@index([projectId])

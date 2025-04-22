@@ -3,15 +3,32 @@ import { getfacultyData } from "../controllers/faculty/faculty";
 
 import { postProject, updateProject, delProject } from "../controllers/faculty/faculty-project/projects";
 
+import {
+    getApplications,
+    getApplicationById,
+    reviewApplication
+} from "../controllers/faculty/application-review";
+import { getGroupById } from "../controllers/faculty/view-group";
+
 const facultyRouter: Router = Router();
 
-
+// get faculty data
+// /api/faculty/
 facultyRouter.get('/', getfacultyData as RequestHandler);
 
 
-//  /api/faculty/project
+//  post, update, delete project
 facultyRouter.post('/project', postProject as RequestHandler);
 facultyRouter.put('/project/:projectId', updateProject as RequestHandler);
 facultyRouter.delete('/project/:projectId', delProject as RequestHandler);
+
+
+// Application Review
+facultyRouter.get('/applications', getApplications as RequestHandler);
+facultyRouter.get('/applications/:applicationId', getApplicationById as RequestHandler);
+facultyRouter.put('/applications/:applicationId/review', reviewApplication as RequestHandler);
+
+// view group by id
+facultyRouter.get('/groups/:groupId', getGroupById as RequestHandler);
 
 export default facultyRouter;
