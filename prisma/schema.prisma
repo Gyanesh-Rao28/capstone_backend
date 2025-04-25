@@ -1,215 +1,254 @@
-  generator client {
-    provider = "prisma-client-js"
-  }
+generator client {
+  provider = "prisma-client-js"
+}
 
-  datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
-  }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  // // Custom enums
-  // enum UserRole {
-  //   admin
-  //   faculty
-  //   student
-  // }
+// // Custom enums
+// enum UserRole {
+//   admin
+//   faculty
+//   student
+// }
 
-  // // Models
-  // model User {
-  //   id        String   @id @default(uuid())
-  //   googleId  String   @unique
-  //   email     String   @unique
-  //   name      String
-  //   role UserRole
-  //   department String ?
-  //   profilePicture String ?
-  //   createdAt DateTime @default(now())
-  //   updatedAt DateTime @updatedAt
-  // }
+// // Models
+// model User {
+//   id        String   @id @default(uuid())
+//   googleId  String   @unique
+//   email     String   @unique
+//   name      String
+//   role UserRole
+//   department String ?
+//   profilePicture String ?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
 
-  // model Project{
-  //   id String @id @default(uuid())
-  //   name String
-  //   descrition String
-  //   createdAt DateTime @default(now())
-  //   updatedAt DateTime @updatedAt
-  //   user String
-  // }
+// model Project{
+//   id String @id @default(uuid())
+//   name String
+//   descrition String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   user String
+// }
 
-  // ENUMS
-  enum UserRole {
-    admin
-    faculty
-    student
-    user
-  }
+// ENUMS
+enum UserRole {
+  admin
+  faculty
+  student
+  user
+}
 
-  enum CourseType {
-    IDP
-    UROP
-    Capstone
-  }
+enum CourseType {
+  IDP
+  UROP
+  Capstone
+}
 
-  enum ProjectStatus {
-    draft
-    active
-    completed
-    archived
-  }
-  
-  enum ProjectDomain {
-    AIML
-    Cloud
-    Cyber
-    IOT
-  }
+enum ProjectStatus {
+  draft
+  active
+  completed
+  archived
+}
 
-  enum MemberRole {
-    Leader
-    Member
-  }
+enum ProjectDomain {
+  AIML
+  Cloud
+  Cyber
+  IOT
+}
 
-  enum ApplicationStatus {
-    Pending
-    Approved
-    Rejected
-  }
+enum MemberRole {
+  Leader
+  Member
+}
 
-  // SHARED USER MODEL
-  model User {
-    id             String   @id @default(uuid())
-    googleId       String   @unique
-    email          String   @unique
-    name           String
-    role           UserRole @default(student)
-    profilePicture String?
+enum ApplicationStatus {
+  Pending
+  Approved
+  Rejected
+}
 
-    // Role-Specific Relations
-    faculty Faculty?
-    student Student?
-    admin   Admin?
+// SHARED USER MODEL
+model User {
+  id             String   @id @default(uuid())
+  googleId       String   @unique
+  email          String   @unique
+  name           String
+  role           UserRole @default(student)
+  profilePicture String?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-  }
+  // Role-Specific Relations
+  faculty Faculty?
+  student Student?
+  admin   Admin?
 
-  // ADMIN MODEL (Only for Admin Users)
-  model Admin {
-    id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  }
+// ADMIN MODEL (Only for Admin Users)
+model Admin {
+  id String @id @default(uuid())
 
-  // FACULTY MODEL (Only for Faculty Users)
-  model Faculty {
-    id String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+// FACULTY MODEL (Only for Faculty Users)
+model Faculty {
+  id String @id @default(uuid())
 
-    department  String?
-    designation String?
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+  email  String @unique
 
-    projects Project[]
-  }
+  department  String?
+  designation String?
 
-  // STUDENT MODEL (Only for Student Users)
-  model Student {
-    id        String  @id @default(uuid())
+  projects    Project[]
+  assessments Assessment[]
+}
 
-    userId    String  @unique
-    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+// STUDENT MODEL (Only for Student Users)
+model Student {
+  id String @id @default(uuid())
 
-    studentId String  @unique //AP2110010239
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+  email  String @unique
 
-    batch     String?
+  studentId String @unique //AP2110010239
 
-    members Member[]
+  batch String?
 
-  }
+  members     Member[]
+  submissions Submission[]
+}
 
-  // PROJECT MODEL (Faculty-Created Projects)
-  model Project {
-    id String @id @default(uuid())
+// PROJECT MODEL (Faculty-Created Projects)
+model Project {
+  id String @id @default(uuid())
 
-    facultyId String
-    faculty   Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  facultyId String
+  faculty   Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
 
-    title       String
-    description String @db.Text
-    domain      ProjectDomain @default(AIML)
-    course      CourseType    @default(IDP)
-    status      ProjectStatus @default(draft)
-    tags String[]
-    deadline    DateTime?
+  title       String
+  description String        @db.Text
+  domain      ProjectDomain @default(AIML)
+  course      CourseType    @default(IDP)
+  status      ProjectStatus @default(draft)
+  tags        String[]
+  deadline    DateTime?
 
+  Group              Group[]
+  projectApplication ProjectApplication[]
 
-    Group     Group[]
-    projectApplication ProjectApplication[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  @@index([facultyId])
+}
 
-    @@index([facultyId])
-  }
+model Group {
+  id String @id @default(uuid())
 
-  model Group {
-    id String @id @default(uuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    projectId String
-    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  inviteCode String @unique @default(uuid())
 
-    inviteCode String @unique @default(uuid())
+  name String
 
-    name       String
+  maxMembers    Int @default(4)
+  currentMember Int @default(1)
 
-    maxMembers Int @default(4)
-    currentMember Int @default(1)
+  isOpen Boolean @default(true)
 
-    isOpen Boolean @default(true)
+  members            Member[]
+  projectApplication ProjectApplication[]
 
-    members Member[]
-    projectApplication ProjectApplication[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  assessments Assessment[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  @@index([projectId])
+}
 
-    @@index([projectId])
-  }
+model Member {
+  id String @id @default(uuid())
 
-  model Member {
-    id String  @id @default(uuid())
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-    groupId String
-    group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-    studentId String
-    student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  memberRole MemberRole @default(Member)
 
-    memberRole MemberRole @default(Member)
+  joinedAt DateTime @default(now())
 
-    joinedAt DateTime @default(now())
+  @@unique([groupId, studentId])
+  @@index([groupId])
+  @@index([studentId])
+}
 
-    @@index([groupId])
-    @@index([studentId])
-    @@unique([groupId, studentId])
-  }
+model ProjectApplication {
+  id String @id @default(uuid())
 
-  model ProjectApplication {
-    id String @id @default(uuid())
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-    groupId String
-    group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    projectId String
-    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  applicationStatus ApplicationStatus @default(Pending)
 
-    applicationStatus ApplicationStatus @default(Pending)
+  // add project application created time in order filter the application in asc/desc order
 
-    // add project application created time in order filter the application in asc/desc order
+  @@unique([groupId, projectId])
+  @@index([groupId])
+  @@index([projectId])
+}
 
-    @@index([groupId])
-    @@index([projectId])
-    @@unique([groupId, projectId])
-  }
+model Assessment {
+  id             String       @id @default(uuid())
+  facultyId      String
+  faculty        Faculty      @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  groupId        String
+  group          Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  title          String
+  description    String       @db.Text
+  googleMeetLink String
+  deadline       DateTime
+  submissions    Submission[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([facultyId])
+  @@index([groupId])
+}
+
+model Submission {
+  id           String     @id @default(uuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  content      String     @db.Text
+  attachments  String[] // URLs for files like images, videos, etc.
+  submittedAt  DateTime   @default(now())
+  grade        Float?
+
+  @@unique([assessmentId, studentId])
+  @@index([assessmentId])
+  @@index([studentId])
+}

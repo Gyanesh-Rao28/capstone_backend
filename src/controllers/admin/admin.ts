@@ -91,6 +91,8 @@ export const uploadFacultyCSV = async (req: Request, res: Response, next: NextFu
                 facultyData.push(row);
             })
             .on('end', async () => {
+                console.log('Parsed Faculty Data:', facultyData); // Debugging line
+
                 try {
                     // Insert data into the database
                     for (const faculty of facultyData) {
@@ -101,7 +103,9 @@ export const uploadFacultyCSV = async (req: Request, res: Response, next: NextFu
                                         name: faculty.name,
                                         email: faculty.email,
                                         role: 'faculty',
-                                        googleId: faculty.googleId || null, // Provide googleId or set it to null
+                                        // googleId : faculty.googleId || null, // Provide googleId or set it to null
+                                        googleId: faculty.googleId || 'temp-' + Math.random().toString(36).substring(2, 15), // Generate a temporary ID if not provided this is just for now
+
                                     },
                                 },
                                 department: faculty.department,
@@ -149,7 +153,9 @@ export const uploadStudentCSV = async (req: Request, res: Response, next: NextFu
                                         name: student.name,
                                         email: student.email,
                                         role: 'student',
-                                        googleId: student.googleId || null, // Provide googleId or set it to null
+                                        // googleId: student.googleId || null, // Provide googleId or set it to null
+                                        googleId: student.googleId || 'temp-' + Math.random().toString(36).substring(2, 15), // Generate a temporary ID if not provided this is just for now
+
                                     },
                                 },
                                 studentId: student.studentId,
