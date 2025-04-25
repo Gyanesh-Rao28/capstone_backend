@@ -17,9 +17,6 @@ import { StudentMiddleware } from "../middlewares/student-auth";
 // Authorized
 import { getProject, getProjectById } from "../controllers/project";
 import studentRouter from "./student";
-import { upload } from "../middlewares/fileUpload";
-
-
 
 
 
@@ -34,6 +31,8 @@ rootRouter.use('/student', StudentMiddleware, studentRouter)
 //project
 rootRouter.get('/projects', getProject as RequestHandler)
 rootRouter.get('/project/:projectId', getProjectById as RequestHandler)
+
+
 
 
 export default rootRouter

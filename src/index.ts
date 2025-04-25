@@ -1,3 +1,5 @@
+// src/index.ts
+
 import express, {Express, Request, Response} from "express";
 import rootRouter from "./routes";
 import session from 'express-session';
@@ -35,7 +37,10 @@ initializeFileSystem();
 // Oautn routes
 app.get('/auth/google',
     passport.authenticate('google', {
-        scope: ['profile', 'email']
+        scope: [
+            'profile',
+            'email'
+        ]
     })  
 );
 
