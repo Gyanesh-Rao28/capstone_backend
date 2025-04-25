@@ -1,6 +1,7 @@
 import { Router, RequestHandler } from "express";
 import { getfacultyData } from "../controllers/faculty/faculty";
-
+import { createAssessment, getAssessmentsByFaculty, gradeSubmission } from "../controllers/faculty/assessment";
+import { isAuthenticated } from '../middlewares/google-auth';
 import { postProject, updateProject, delProject } from "../controllers/faculty/faculty-project/projects";
 
 import {
@@ -30,5 +31,9 @@ facultyRouter.put('/applications/:applicationId/review', reviewApplication as Re
 
 // view group by id
 facultyRouter.get('/groups/:groupId', getGroupById as RequestHandler);
+
+facultyRouter.post('/assessments', isAuthenticated, createAssessment as RequestHandler);
+facultyRouter.get('/assessments', isAuthenticated, getAssessmentsByFaculty as RequestHandler);
+facultyRouter.post('/submissions/grade', isAuthenticated, gradeSubmission as RequestHandler);
 
 export default facultyRouter;
