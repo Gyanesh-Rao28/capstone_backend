@@ -17,6 +17,8 @@ import { StudentMiddleware } from "../middlewares/student-auth";
 // Authorized
 import { getProject, getProjectById } from "../controllers/project";
 import studentRouter from "./student";
+import { upload } from "../middlewares/fileUpload";
+
 
 
 

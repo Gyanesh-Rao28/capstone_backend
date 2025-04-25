@@ -9,6 +9,8 @@ import { isAuthenticated } from "./middlewares/google-auth";
 
 import { UserType, UserWithToken } from './types/index';
 
+import { initializeFileSystem } from './helper/fileSystem';
+
 
 const app:Express = express();
 const PORT = process.env.PORT || 5000
@@ -27,6 +29,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }))
+
+initializeFileSystem();
 
 // Oautn routes
 app.get('/auth/google',
