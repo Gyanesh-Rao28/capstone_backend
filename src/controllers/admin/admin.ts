@@ -98,18 +98,18 @@ export const uploadFacultyCSV = async (req: Request, res: Response, next: NextFu
                     for (const faculty of facultyData) {
                         await prisma.faculty.create({
                             data: {
+                                name: faculty.name, // Add name directly to Faculty
+                                email: faculty.email, // Add email directly to Faculty
+                                department: faculty.department,
+                                designation: faculty.designation,
                                 user: {
                                     create: {
                                         name: faculty.name,
                                         email: faculty.email,
                                         role: 'faculty',
-                                        // googleId : faculty.googleId || null, // Provide googleId or set it to null
-                                        googleId: faculty.googleId || 'temp-' + Math.random().toString(36).substring(2, 15), // Generate a temporary ID if not provided this is just for now
-
+                                        googleId: faculty.googleId || 'temp-' + Math.random().toString(36).substring(2, 15), // Generate a temporary ID if not provided
                                     },
                                 },
-                                department: faculty.department,
-                                designation: faculty.designation,
                             },
                         });
                     }
@@ -148,18 +148,18 @@ export const uploadStudentCSV = async (req: Request, res: Response, next: NextFu
                     for (const student of studentData) {
                         await prisma.student.create({
                             data: {
+                                name: student.name, // Add name directly to Student
+                                email: student.email, // Add email directly to Student
+                                studentId: student.studentId,
+                                batch: student.batch,
                                 user: {
                                     create: {
                                         name: student.name,
                                         email: student.email,
                                         role: 'student',
-                                        // googleId: student.googleId || null, // Provide googleId or set it to null
-                                        googleId: student.googleId || 'temp-' + Math.random().toString(36).substring(2, 15), // Generate a temporary ID if not provided this is just for now
-
+                                        googleId: student.googleId || 'temp-' + Math.random().toString(36).substring(2, 15), // Generate a temporary ID if not provided
                                     },
                                 },
-                                studentId: student.studentId,
-                                batch: student.batch,
                             },
                         });
                     }
