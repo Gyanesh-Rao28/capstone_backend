@@ -32,8 +32,5 @@ facultyRouter.put('/applications/:applicationId/review', reviewApplication as Re
 // view group by id
 facultyRouter.get('/groups/:groupId', getGroupById as RequestHandler);
 
-facultyRouter.post('/assessments', isAuthenticated, createAssessment as RequestHandler);
-facultyRouter.get('/assessments', isAuthenticated, getAssessmentsByFaculty as RequestHandler);
-facultyRouter.post('/submissions/grade', isAuthenticated, gradeSubmission as RequestHandler);
 
 export default facultyRouter;

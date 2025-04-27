@@ -13,7 +13,8 @@ export const createAssessment = async (req: Request, res: Response) => {
               status: 'Unauthorized',
               message: 'Invalid Faculty Id',
           });
-      }
+    } 
+    
 
       const group = await prisma.group.findUnique({
           where: { id: groupId },

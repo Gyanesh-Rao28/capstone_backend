@@ -244,7 +244,7 @@ model Submission {
   studentId    String
   student      Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
   content      String     @db.Text
-  attachments  String[] // URLs for files like images, videos, etc.
+  attachments  String[]   // URLs for files like images, videos, etc.
   submittedAt  DateTime   @default(now())
   grade        Float?
 
