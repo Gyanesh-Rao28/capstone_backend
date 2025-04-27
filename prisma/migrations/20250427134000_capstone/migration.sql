@@ -1,10 +1,6 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('admin', 'faculty', 'student', 'user');
 
-  - You are about to drop the column `department` on the `User` table. All the data in the column will be lost.
-  - Added the required column `updatedAt` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
 CREATE TYPE "CourseType" AS ENUM ('IDP', 'UROP', 'Capstone');
 
@@ -20,22 +16,19 @@ CREATE TYPE "MemberRole" AS ENUM ('Leader', 'Member');
 -- CreateEnum
 CREATE TYPE "ApplicationStatus" AS ENUM ('Pending', 'Approved', 'Rejected');
 
--- AlterEnum
--- This migration adds more than one value to an enum.
--- With PostgreSQL versions 11 and earlier, this is not possible
--- in a single migration. This can be worked around by creating
--- multiple migrations, each migration adding only one value to
--- the enum.
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "googleId" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'student',
+    "profilePicture" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-
-ALTER TYPE "UserRole" ADD VALUE 'user';
-ALTER TYPE "UserRole" ADD VALUE 'fan';
-
--- AlterTable
-ALTER TABLE "User" DROP COLUMN "department",
-ADD COLUMN     "profilePicture" TEXT,
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
-ALTER COLUMN "role" SET DEFAULT 'student';
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Admin" (
@@ -49,7 +42,9 @@ CREATE TABLE "Admin" (
 CREATE TABLE "Faculty" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "department" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "department" TEXT,
     "designation" TEXT,
 
     CONSTRAINT "Faculty_pkey" PRIMARY KEY ("id")
@@ -59,6 +54,8 @@ CREATE TABLE "Faculty" (
 CREATE TABLE "Student" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "studentId" TEXT NOT NULL,
     "batch" TEXT,
 
@@ -72,8 +69,8 @@ CREATE TABLE "Project" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "domain" "ProjectDomain" NOT NULL DEFAULT 'AIML',
-    "status" "ProjectStatus" NOT NULL DEFAULT 'draft',
     "course" "CourseType" NOT NULL DEFAULT 'IDP',
+    "status" "ProjectStatus" NOT NULL DEFAULT 'draft',
     "tags" TEXT[],
     "deadline" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -118,6 +115,40 @@ CREATE TABLE "ProjectApplication" (
     CONSTRAINT "ProjectApplication_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Assessment" (
+    "id" TEXT NOT NULL,
+    "facultyId" TEXT NOT NULL,
+    "groupId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "googleMeetLink" TEXT NOT NULL,
+    "deadline" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Assessment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Submission" (
+    "id" TEXT NOT NULL,
+    "assessmentId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "attachments" TEXT[],
+    "submittedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "grade" DOUBLE PRECISION,
+
+    CONSTRAINT "Submission_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_googleId_key" ON "User"("googleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Admin_userId_key" ON "Admin"("userId");
 
@@ -125,7 +156,13 @@ CREATE UNIQUE INDEX "Admin_userId_key" ON "Admin"("userId");
 CREATE UNIQUE INDEX "Faculty_userId_key" ON "Faculty"("userId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Faculty_email_key" ON "Faculty"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Student_email_key" ON "Student"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Student_studentId_key" ON "Student"("studentId");
@@ -157,6 +194,21 @@ CREATE INDEX "ProjectApplication_projectId_idx" ON "ProjectApplication"("project
 -- CreateIndex
 CREATE UNIQUE INDEX "ProjectApplication_groupId_projectId_key" ON "ProjectApplication"("groupId", "projectId");
 
+-- CreateIndex
+CREATE INDEX "Assessment_facultyId_idx" ON "Assessment"("facultyId");
+
+-- CreateIndex
+CREATE INDEX "Assessment_groupId_idx" ON "Assessment"("groupId");
+
+-- CreateIndex
+CREATE INDEX "Submission_assessmentId_idx" ON "Submission"("assessmentId");
+
+-- CreateIndex
+CREATE INDEX "Submission_studentId_idx" ON "Submission"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Submission_assessmentId_studentId_key" ON "Submission"("assessmentId", "studentId");
+
 -- AddForeignKey
 ALTER TABLE "Admin" ADD CONSTRAINT "Admin_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -183,3 +235,15 @@ ALTER TABLE "ProjectApplication" ADD CONSTRAINT "ProjectApplication_groupId_fkey
 
 -- AddForeignKey
 ALTER TABLE "ProjectApplication" ADD CONSTRAINT "ProjectApplication_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Assessment" ADD CONSTRAINT "Assessment_facultyId_fkey" FOREIGN KEY ("facultyId") REFERENCES "Faculty"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Assessment" ADD CONSTRAINT "Assessment_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Submission" ADD CONSTRAINT "Submission_assessmentId_fkey" FOREIGN KEY ("assessmentId") REFERENCES "Assessment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Submission" ADD CONSTRAINT "Submission_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE CASCADE ON UPDATE CASCADE;
