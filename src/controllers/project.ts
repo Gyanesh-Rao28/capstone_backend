@@ -59,10 +59,22 @@ export const getProjectById = async (req: Request, res: Response) => {
             });
         }
 
-        const project:ProjectType|null = await prisma.project.findUnique({
+        const project = await prisma.project.findUnique({
             where: {
                 id: projectId
             },
+            include:{
+                faculty:{
+                    select:{
+                        user:{
+                            select:{
+                                email: true,
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
         })
         
 

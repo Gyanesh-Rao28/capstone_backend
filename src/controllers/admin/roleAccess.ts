@@ -51,20 +51,11 @@ export const assignFacultyRole = async (req: Request, res: Response) => {
             }
         });
 
-        const { name, email } = req.body;
-
-        if (!name || !email) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'name and email are required'
-            });
-            return;
-        }
 
         await prisma.faculty.create({
             data: {
-                name: String(name),
-                email: String(email),
+                // name: String(name),
+                // email: String(email),
                 userId: userId as string,
                 department: department ? String(department) : "Not Assigned",
                 designation: designation ? String(designation) : "Not Assigned"
@@ -165,8 +156,8 @@ export const assignStudentRole = async (req: Request, res: Response) => {
                 userId: userId as string,
                 studentId: studentId as string,
                 batch: batch ? String(batch) : String(new Date().getFullYear()),
-                name: userExist.name,
-                email: userExist.email
+                // name: userExist.name,
+                // email: userExist.email
             }
         });
 

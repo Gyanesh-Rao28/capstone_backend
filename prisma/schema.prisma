@@ -107,8 +107,9 @@ model Faculty {
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name   String
-  email  String @unique
+
+  // name   String
+  // email  String @unique
 
   department  String?
   designation String?
@@ -123,8 +124,9 @@ model Student {
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name   String
-  email  String @unique
+
+  // name   String
+  // email  String @unique
 
   studentId String @unique //AP2110010239
 

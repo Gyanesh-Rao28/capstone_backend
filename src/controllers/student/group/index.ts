@@ -7,10 +7,6 @@ import { generateInviteCode } from '../../../helper/InviteCodeGenerator';
 export const createGroup = async (req: Request, res: Response) => {
     try {
         
-        // const pid = "3d20255a-e357-4745-b9be-0e72bb2ae83e";
-        // const studentId = "258003e4-91de-4180-8906-a6d288bb540b";
-        // const grpName = "NBytes";
-
         const { projectId, grpName } = req.query;
         const studentId = req.user?.student?.id
         // can extract studentId from req.user
@@ -18,7 +14,7 @@ export const createGroup = async (req: Request, res: Response) => {
         if(!projectId || !studentId || !grpName){
             res.status(404).json({
                 status: 'Not found',
-                message: "all fields required."
+                message: `${projectId} ${studentId} ${grpName}} all fields required.`
             })
             return;
         }
