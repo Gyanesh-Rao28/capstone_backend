@@ -61,7 +61,7 @@ export const getApplications = async (req: Request, res: Response) => {
                                 memberRole: true,
                                 student:{
                                     select:{
-                                        studentId: true
+                                        rollNumber: true
                                     }
                                 }
                             }
@@ -120,7 +120,7 @@ export const getApplicationById = async (req: Request, res: Response) => {
                                 student:{
                                     select:{
                                         id: true,
-                                        studentId: true,
+                                        rollNumber: true,
                                         user:{
                                             select:{
                                                 name: true,

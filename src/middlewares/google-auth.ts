@@ -15,7 +15,6 @@ const client = new OAuth2Client({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET
 });
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
 export const isAuthenticated = async (
     req: RequestWithUser,

@@ -7,36 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// // Custom enums
-// enum UserRole {
-//   admin
-//   faculty
-//   student
-// }
 
-// // Models
-// model User {
-//   id        String   @id @default(uuid())
-//   googleId  String   @unique
-//   email     String   @unique
-//   name      String
-//   role UserRole
-//   department String ?
-//   profilePicture String ?
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
-
-// model Project{
-//   id String @id @default(uuid())
-//   name String
-//   descrition String
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   user String
-// }
-
-// ENUMS
 enum UserRole {
   admin
   faculty
@@ -115,7 +86,6 @@ model Faculty {
   designation String?
 
   projects    Project[]
-  assessments Assessment[]
 }
 
 // STUDENT MODEL (Only for Student Users)
@@ -125,15 +95,11 @@ model Student {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // name   String
-  // email  String @unique
-
-  studentId String @unique //AP2110010239
+  rollNumber String? @unique //AP2110010239
 
   batch String?
 
   members     Member[]
-  submissions Submission[]
 }
 
 // PROJECT MODEL (Faculty-Created Projects)
@@ -153,6 +119,7 @@ model Project {
 
   Group              Group[]
   projectApplication ProjectApplication[]
+  Submission Submission[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -180,7 +147,6 @@ model Group {
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  assessments Assessment[]
 
   @@index([projectId])
 }
@@ -214,43 +180,25 @@ model ProjectApplication {
 
   applicationStatus ApplicationStatus @default(Pending)
 
-  // add project application created time in order filter the application in asc/desc order
+  motivation String @default("")
 
   @@unique([groupId, projectId])
   @@index([groupId])
   @@index([projectId])
 }
 
-model Assessment {
-  id             String       @id @default(uuid())
-  facultyId      String
-  faculty        Faculty      @relation(fields: [facultyId], references: [id], onDelete: Cascade)
-  groupId        String
-  group          Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  title          String
-  description    String       @db.Text
-  googleMeetLink String
-  deadline       DateTime
-  submissions    Submission[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-
-  @@index([facultyId])
-  @@index([groupId])
-}
-
 model Submission {
   id           String     @id @default(uuid())
-  assessmentId String
-  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  studentId    String
-  student      Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  
   content      String     @db.Text
   attachments  String[]   // URLs for files like images, videos, etc.
   submittedAt  DateTime   @default(now())
   grade        Float?
 
-  @@unique([assessmentId, studentId])
-  @@index([assessmentId])
-  @@index([studentId])
+  // @@unique([ projectId])
+  @@index([projectId])
 }

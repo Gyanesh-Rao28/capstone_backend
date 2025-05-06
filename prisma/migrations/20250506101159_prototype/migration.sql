@@ -42,8 +42,6 @@ CREATE TABLE "Admin" (
 CREATE TABLE "Faculty" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
     "department" TEXT,
     "designation" TEXT,
 
@@ -54,9 +52,7 @@ CREATE TABLE "Faculty" (
 CREATE TABLE "Student" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
+    "rollNumber" TEXT,
     "batch" TEXT,
 
     CONSTRAINT "Student_pkey" PRIMARY KEY ("id")
@@ -111,30 +107,15 @@ CREATE TABLE "ProjectApplication" (
     "groupId" TEXT NOT NULL,
     "projectId" TEXT NOT NULL,
     "applicationStatus" "ApplicationStatus" NOT NULL DEFAULT 'Pending',
+    "motivation" TEXT NOT NULL DEFAULT '',
 
     CONSTRAINT "ProjectApplication_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Assessment" (
-    "id" TEXT NOT NULL,
-    "facultyId" TEXT NOT NULL,
-    "groupId" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "googleMeetLink" TEXT NOT NULL,
-    "deadline" TIMESTAMP(3) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Assessment_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Submission" (
     "id" TEXT NOT NULL,
-    "assessmentId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "attachments" TEXT[],
     "submittedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -156,16 +137,10 @@ CREATE UNIQUE INDEX "Admin_userId_key" ON "Admin"("userId");
 CREATE UNIQUE INDEX "Faculty_userId_key" ON "Faculty"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Faculty_email_key" ON "Faculty"("email");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Student_email_key" ON "Student"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Student_studentId_key" ON "Student"("studentId");
+CREATE UNIQUE INDEX "Student_rollNumber_key" ON "Student"("rollNumber");
 
 -- CreateIndex
 CREATE INDEX "Project_facultyId_idx" ON "Project"("facultyId");
@@ -195,19 +170,7 @@ CREATE INDEX "ProjectApplication_projectId_idx" ON "ProjectApplication"("project
 CREATE UNIQUE INDEX "ProjectApplication_groupId_projectId_key" ON "ProjectApplication"("groupId", "projectId");
 
 -- CreateIndex
-CREATE INDEX "Assessment_facultyId_idx" ON "Assessment"("facultyId");
-
--- CreateIndex
-CREATE INDEX "Assessment_groupId_idx" ON "Assessment"("groupId");
-
--- CreateIndex
-CREATE INDEX "Submission_assessmentId_idx" ON "Submission"("assessmentId");
-
--- CreateIndex
-CREATE INDEX "Submission_studentId_idx" ON "Submission"("studentId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Submission_assessmentId_studentId_key" ON "Submission"("assessmentId", "studentId");
+CREATE INDEX "Submission_projectId_idx" ON "Submission"("projectId");
 
 -- AddForeignKey
 ALTER TABLE "Admin" ADD CONSTRAINT "Admin_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -237,13 +200,4 @@ ALTER TABLE "ProjectApplication" ADD CONSTRAINT "ProjectApplication_groupId_fkey
 ALTER TABLE "ProjectApplication" ADD CONSTRAINT "ProjectApplication_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Assessment" ADD CONSTRAINT "Assessment_facultyId_fkey" FOREIGN KEY ("facultyId") REFERENCES "Faculty"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Assessment" ADD CONSTRAINT "Assessment_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Submission" ADD CONSTRAINT "Submission_assessmentId_fkey" FOREIGN KEY ("assessmentId") REFERENCES "Assessment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Submission" ADD CONSTRAINT "Submission_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Submission" ADD CONSTRAINT "Submission_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;

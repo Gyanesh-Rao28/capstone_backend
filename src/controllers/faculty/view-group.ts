@@ -39,7 +39,7 @@ export const getGroupById = async (req: Request, res: Response) => {
                     include:{
                         student: {
                             select:{
-                                studentId: true,
+                                rollNumber: true,
                                 user:{
                                     select:{
                                         name: true,

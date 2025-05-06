@@ -5,7 +5,9 @@ import { MemberRole } from '@prisma/client';
 
 export const applyToProject = async (req: Request, res: Response) => {
     try {
-        const { projectId, groupId } = req.body;
+         
+        const { projectId, groupId, motivation } = req.body;
+        const studentId = req.user?.student?.id;
 
         if (!projectId) {
             res.status(404).json({
@@ -23,7 +25,15 @@ export const applyToProject = async (req: Request, res: Response) => {
             return;
         }
 
-        const studentId = req.user?.student?.id;
+
+        if (!motivation) {
+            res.status(404).json({
+                status: "Not Found",
+                message: "motivation required"
+            });
+            return;
+        }
+
 
         if (!studentId) {
             res.status(401).json({
@@ -67,7 +77,9 @@ export const applyToProject = async (req: Request, res: Response) => {
         const createApplication = await prisma.projectApplication.create({
             data: {
                 groupId: groupId as string,
-                projectId: projectId as string
+                projectId: projectId as string,
+                motivation: motivation as string
+                
             }
         });
 

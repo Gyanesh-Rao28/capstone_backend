@@ -78,7 +78,7 @@ export const assignFacultyRole = async (req: Request, res: Response) => {
 
 export const assignStudentRole = async (req: Request, res: Response) => {
     try {
-        const { userId, studentId, batch } = req.query;
+        const { userId, rollNumber, batch } = req.query;
 
         if (!userId) {
             res.status(400).json({
@@ -88,10 +88,10 @@ export const assignStudentRole = async (req: Request, res: Response) => {
             return;
         }
 
-        if (!studentId) {
+        if (!rollNumber) {
             res.status(400).json({
                 status: 'Failed',
-                message: 'studentId is required'
+                message: 'rollNumber is required'
             });
             return;
         }
@@ -128,7 +128,7 @@ export const assignStudentRole = async (req: Request, res: Response) => {
         // Check if the studentId is already in use
         const studentIdExists = await prisma.student.findFirst({
             where: {
-                studentId: studentId as string
+                rollNumber: rollNumber as string
             }
         });
 
@@ -154,10 +154,8 @@ export const assignStudentRole = async (req: Request, res: Response) => {
         await prisma.student.create({
             data: {
                 userId: userId as string,
-                studentId: studentId as string,
+                rollNumber: rollNumber as string,
                 batch: batch ? String(batch) : String(new Date().getFullYear()),
-                // name: userExist.name,
-                // email: userExist.email
             }
         });
 

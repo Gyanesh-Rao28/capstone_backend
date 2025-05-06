@@ -31,8 +31,6 @@ export const createGroup = async (req: Request, res: Response) => {
             }
         });
 
-        console.log("stage0: ", isStudentAssociatedWithProject)
-
         if(isStudentAssociatedWithProject){
             res.status(409).json({
                 status: "Conflict",
@@ -50,8 +48,6 @@ export const createGroup = async (req: Request, res: Response) => {
             }
         })
 
-        console.log("stage1: ", isProjectExist)
-        
         if(!isProjectExist){
             res.status(404).json({
                 status: 'Not found',
@@ -79,7 +75,6 @@ export const createGroup = async (req: Request, res: Response) => {
             }
         })
             
-        console.log("stage2: ", group)
 
         if (!group.id) {
             console.log("error in grp id")
@@ -93,7 +88,6 @@ export const createGroup = async (req: Request, res: Response) => {
             }
         })
 
-        console.log("stage 3: ", createGroupLeader)
 
 
         return res.status(200).json({
@@ -438,4 +432,49 @@ export const removeMember = async (req: Request, res: Response) => {
             message: 'Internal server error: adding member'
         });
     }
+};
+
+
+export const getAllGroupByStudent = async (req: Request, res: Response)=>{
+
+    try {
+
+        const studentId = req.user?.student?.id
+
+        if (!studentId) {
+            res.status(401).json({
+                status: "Unauthorized",
+                message: "Invalid Student Id"
+            })
+            return;
+        }
+
+        const groups = await prisma.group.findMany({
+            where:{
+                members:{
+                    some:{
+                        studentId: studentId
+                    }
+                }
+            }
+        })
+       
+
+        
+
+        return res.status(200).json({
+            status: 'success',
+            data: groups
+        });
+
+
+    } catch (error) {
+        console.error('Error adding member:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Internal server error: get all groups by student'
+        });
+    }
+
+
 };
